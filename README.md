@@ -53,7 +53,7 @@ Esta pensado para un equipo de cualquier plataforma que recibe propuestas de con
 - Podcast #4 – Cierre y reflexión 
 
 # 📎Enlaces de archivos y desarollo
-- 📈 [Diagrama de flujo en app.eraser.io ](https://app.eraser.io/workspace/LPF307td3aL9VXfRojTQ?origin=share)
+- 📈 Diagrama de flujo en app.eraser.io 
 
   <img width="4494" height="1643" alt="diagram-export-3-23-2026-4_10_08-PM" src="https://github.com/user-attachments/assets/c14c3bbe-02fb-4a4d-b5f0-eda728555a6d" />
 > 📁 _Archivo PSeint tambien disponible en directorio Diagramas de flujo/Projecto_GestorDecisiones_Fase1.psc_
