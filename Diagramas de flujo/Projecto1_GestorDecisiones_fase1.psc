@@ -58,16 +58,15 @@ Funcion txt <- Validacion_TipoContenido(opcion1)
 FinFuncion
 
 // Función que retorna la clasificacion del contenido según opción1
-Funcion txt <- Validacion_ClasificacionContenido(opcion1)
-	Definir txt Como Caracter
+Funcion n1 <- Validacion_ClasificacionContenido(opcion1)
+	Definir n1 Como entero // cambio de variable a entero para mejor versatilidad
 	Segun opcion1 Hacer
-		1: txt <- "Todo Público";
-		2: txt <- "+13";
-		3: txt <- "+18";
-		De Otro Modo: txt <- "Desconocido";
+		1: n1 <- 2; // indica que es para todas las edades
+		2: n1 <- 13;
+		3: n1 <- 18;
+		De Otro Modo: n1 <- 0;
 	FinSegun
 FinFuncion
-
 
 // Función que retorna el nivel de produccion del contenido según opción1
 Funcion txt <- Validacion_Produccion(opcion1)
@@ -80,54 +79,90 @@ Funcion txt <- Validacion_Produccion(opcion1)
 	FinSegun
 FinFuncion
 
+
+// Validación técnica: clasificación vs horario
+Funcion mensaje <- Validacion_Clasificacion_Horario(clasificacion, horaPrograma)
+	Definir mensaje Como Caracter
+	mensaje <- ""   // definir variable sin error
+	Si clasificacion == 2 Entonces
+		// Todo público: siempre permitido
+		mensaje <- ""   // sin error por defecto
+	SiNo
+		Si clasificacion == 13 Entonces
+			Si horaPrograma < 6 O horaPrograma > 22 Entonces
+				mensaje <- "Clasificación +13 solo puede emitirse entre 06:00 y 22:00."
+			FinSi
+		SiNo
+			Si clasificacion == 18 Entonces
+				Si horaPrograma >= 6 Y horaPrograma <= 21 Entonces
+					mensaje <- "Clasificación +18 solo puede emitirse entre 22:00 y 05:00."
+				FinSi
+			FinSi
+		FinSi
+	FinSi
+FinFuncion
+
+
+// Validación técnica: duración (ejemplo: entre 1 y 300 minutos)
+Funcion mensaje <- Validacion_Duracion(contenido, duracion)
+	Definir mensaje Como Caracter
+	mensaje <- ""   // por defecto, sin error
+	Segun contenido Hacer
+		"Película":
+			Si duracion < 60 O duracion > 180 Entonces
+				mensaje <- "Las películas deben durar entre 60 y 180 minutos."
+			FinSi
+		"Serie":
+			Si duracion < 20 O duracion > 90 Entonces
+				mensaje <- "Las series deben durar entre 20 y 90 minutos."
+			FinSi
+		"Documental":
+			Si duracion < 30 O duracion > 120 Entonces
+				mensaje <- "Los documentales deben durar entre 30 y 120 minutos."
+			FinSi
+		"Evento en vivo":
+			Si duracion < 30 O duracion > 240 Entonces
+				mensaje <- "Los eventos en vivo deben durar entre 30 y 240 minutos."
+			FinSi
+		De Otro Modo:
+			mensaje <- "Tipo de contenido no reconocido para validar duración."
+	FinSegun
+FinFuncion
+
+// Validación técnica: nivel de producción (opcional: rechazar nivel bajo)
+Funcion mensaje <- Validacion_NivelProduccion(nivel, clasificacion)
+	Definir mensaje Como Caracter
+	mensaje <- ""   // sin error por defecto
+	Si nivel = "Bajo" Y clasificacionNum = 18 Entonces
+		mensaje <- "No se permite producción baja para contenido +18."
+	FinSi
+	// Para otros casos (Bajo con +13 o Todo público, o cualquier nivel Medio/Alto) no hay error
+FinFuncion
+
 // Main
 Algoritmo Projecto1_GestorDecisiones_fase1
-	// Defincion variables Menu Principal
+	// Defincion variables
 	Definir Usuario Como Caracter
-	Definir submenu1 Como Entero
 	
 	// Variables del contenido para transportar datos a variables 
+	definir nombreContenido Como Caracter
 	Definir contenido Como Caracter
 	Definir duracion Como Entero
-	Definir clasificacion Como Caracter
+	Definir clasificacion Como Entero
+	Definir clasificacionTexto Como Caracter
 	Definir horaPrograma Como Entero
 	Definir nivelProduccion Como Caracter
 	
-	// Variables del contenido 1
+	// Variables del contenidos 1 - 4
 	Definir infoContenido1 Como Caracter
-	Definir contenido1 Como Caracter
-	Definir duracion1 Como Entero
-	Definir clasificacion1 Como Caracter
-	Definir horaPrograma1 Como Entero
-	Definir nivelProduccion1 Como Caracter
-	
-	// Variables del contenido 2
 	Definir infoContenido2 Como Caracter
-	Definir contenido2 Como Caracter
-	Definir duracion2 Como Entero
-	Definir clasificacion2 Como Caracter
-	Definir horaPrograma2 Como Entero
-	Definir nivelProduccion2 Como Caracter
-	
-	// Variables del contenido 3
 	Definir infoContenido3 Como Caracter
-	Definir contenido3 Como Caracter
-	Definir duracion3 Como Entero
-	Definir clasificacion3 Como Caracter
-	Definir horaPrograma3 Como Entero
-	Definir nivelProduccion3 Como Caracter
-	
-	// Variables del contenido 4
 	Definir infoContenido4 Como Caracter
-	Definir contenido4 Como Caracter
-	Definir duracion4 Como Entero
-	Definir clasificacion4 Como Caracter
-	Definir horaPrograma4 Como Entero
-	Definir nivelProduccion4 Como Caracter
 	
-	// Variables auxiliares menu
+	// Variables auxiliares evaluacion de datos
 	Definir opcionTipo Como Entero
 	Definir contadorContenido Como Entero
+	Definir errorAcumulado Como Caracter
 	
 	Escribir "Ingresa el nombre de tu usuario";
 	leer Usuario;
@@ -142,8 +177,10 @@ Algoritmo Projecto1_GestorDecisiones_fase1
 			1:
 				// Condicional para verificar si suportamos datos aun
 				si contadorContenido < 4 Entonces
-					contadorContenido = contadorContenido + 1; // expresion se puede simplicar con contadorContenido++;
-					Escribir "Ingresa los siguentes datos:"
+					Escribir "Ingresa los siguentes datos:";
+					Escribir "-----------------------------";
+					Escribir "Cual es el nombre del contenido?";
+					leer nombreContenido;
 					// Validar tipo de contenido
 					Repetir
 						TipoContenido()
@@ -161,9 +198,12 @@ Algoritmo Projecto1_GestorDecisiones_fase1
 						Escribir "Cual es la duración del contenido (minutos)?"
 						Leer duracion
 						Si duracion <= 0 Entonces
-							Escribir "Error: Ingrese una duración positiva."
+							Escribir "Error: Ingrese una duración mayor a 0."
 						FinSi
-					Hasta Que duracion > 0
+						si duracion >= 241 Entonces
+							Escribir "Error: Ingrese una duración menor a 240."
+						FinSi
+					Hasta Que duracion > 0 y duracion < 240
 					
 					// Validar Clasificacion del Contenido
 					Repetir
@@ -176,6 +216,13 @@ Algoritmo Projecto1_GestorDecisiones_fase1
 					
 					// Usando return para asignar valor a clasificacion
 					clasificacion <- Validacion_ClasificacionContenido(opcionTipo) 
+					
+					// usando un switch para convertir valores en string
+					Segun opcionTipo Hacer
+						1: clasificacionTexto <- "Todo Público"
+						2: clasificacionTexto <- "+13"
+						3: clasificacionTexto <- "+18"
+					FinSegun
 					
 					// Validación de HORA (Usando su propia variable)
 					Repetir
@@ -198,22 +245,44 @@ Algoritmo Projecto1_GestorDecisiones_fase1
 					// Usando return para asignar valor a produccion
 					nivelProduccion <- Validacion_Produccion(opcionTipo)
 					
-					// bloque de condicionales y asignacion de datos para guardar en el espacio correspondiente
-					si contadorContenido == 1 Entonces
-						infoContenido1 <- "Tipo: " + contenido + " | Duración: " + ConvertirATexto(duracion) + " min | Clasificación: " + clasificacion + " | Hora: " + ConvertirATexto(horaPrograma) + ":00 | Producción: " + nivelProduccion
-					FinSi
-					si contadorContenido == 2 Entonces
-						infoContenido2 <- "Tipo: " + contenido + " | Duración: " + ConvertirATexto(duracion) + " min | Clasificación: " + clasificacion + " | Hora: " + ConvertirATexto(horaPrograma) + ":00 | Producción: " + nivelProduccion
-					FinSi
-					si contadorContenido == 3 Entonces
-						infoContenido3 <- "Tipo: " + contenido + " | Duración: " + ConvertirATexto(duracion) + " min | Clasificación: " + clasificacion + " | Hora: " + ConvertirATexto(horaPrograma) + ":00 | Producción: " + nivelProduccion
-					FinSi
-					si contadorContenido == 4 Entonces
-						infoContenido4 <- "Tipo: " + contenido + " | Duración: " + ConvertirATexto(duracion) + " min | Clasificación: " + clasificacion + " | Hora: " + ConvertirATexto(horaPrograma) + ":00 | Producción: " + nivelProduccion
+					// ========== 2.2 VALIDACION TECNICA  ==========
+					// Objetivo es hacer metodos para hacer el codigo mas limpio
+					errorAcumulado <- ""
+					
+					// 1. Clasificación y horario
+					errorAcumulado = Validacion_Clasificacion_Horario(clasificacion, horaPrograma)
+					
+					// 2. Duración (solo si no hay error previo)
+					Si errorAcumulado = "" Entonces
+						errorAcumulado <- Validacion_Duracion(contenido, duracion)
 					FinSi
 					
+					// 3. Nivel de producción (solo si no hay error previo)
+					Si errorAcumulado = "" Entonces
+						errorAcumulado <- Validacion_NivelProduccion(nivelProduccion, clasificacion)
+					FinSi
+					
+					// Decidir si se aprueba el contenido
+					Si errorAcumulado = "" Entonces
+						Escribir "¡Contenido aprobado y guardado!"
+						Escribir "----------------------------------------"
+						contadorContenido = contadorContenido + 1; // expresion se puede simplicar con contadorContenido++;
+						
+						// Guardar iformaccion de contenido según el contador 
+						Segun contadorContenido Hacer
+							1: infoContenido1 <- nombreContenido + " | Tipo: " + contenido + " | Duración: " + ConvertirATexto(duracion) + " min | Clasificación: " + clasificacionTexto + " | Hora: " + ConvertirATexto(horaPrograma) + ":00 | Producción: " + nivelProduccion
+							2: infoContenido2 <- nombreContenido + " | Tipo: " + contenido + " | Duración: " + ConvertirATexto(duracion) + " min | Clasificación: " + clasificacionTexto + " | Hora: " + ConvertirATexto(horaPrograma) + ":00 | Producción: " + nivelProduccion
+							3: infoContenido3 <- nombreContenido + " | Tipo: " + contenido + " | Duración: " + ConvertirATexto(duracion) + " min | Clasificación: " + clasificacionTexto + " | Hora: " + ConvertirATexto(horaPrograma) + ":00 | Producción: " + nivelProduccion
+							4: infoContenido4 <- nombreContenido + " | Tipo: " + contenido + " | Duración: " + ConvertirATexto(duracion) + " min | Clasificación: " + clasificacionTexto + " | Hora: " + ConvertirATexto(horaPrograma) + ":00 | Producción: " + nivelProduccion
+						FinSegun
+					SiNo
+						Escribir "El contenido fue rechazado por la siguiente razón:"
+						Escribir errorAcumulado
+						Escribir "----------------------------------------"
+					FinSi
 				SiNo
 					Escribir "Error: Bibilioteca de datos esta llena"; 
+					Escribir "----------------------------------------"
 				FinSi
 			2:
 				Escribir "Seleccionaste la opción 2"
