@@ -79,7 +79,6 @@ Funcion txt <- Validacion_Produccion(opcion1)
 	FinSegun
 FinFuncion
 
-
 // Validación técnica: clasificación vs horario
 Funcion mensaje <- Validacion_Clasificacion_Horario(clasificacion, horaPrograma)
 	Definir mensaje Como Caracter
@@ -101,7 +100,6 @@ Funcion mensaje <- Validacion_Clasificacion_Horario(clasificacion, horaPrograma)
 		FinSi
 	FinSi
 FinFuncion
-
 
 // Validación técnica: duración (ejemplo: entre 1 y 300 minutos)
 Funcion mensaje <- Validacion_Duracion(contenido, duracion)
@@ -133,11 +131,117 @@ FinFuncion
 Funcion mensaje <- Validacion_NivelProduccion(nivel, clasificacion)
 	Definir mensaje Como Caracter
 	mensaje <- ""   // sin error por defecto
-	Si nivel = "Bajo" Y clasificacionNum = 18 Entonces
+	Si nivel = "Bajo" Y clasificacion = 18 Entonces
 		mensaje <- "No se permite producción baja para contenido +18."
 	FinSi
 	// Para otros casos (Bajo con +13 o Todo público, o cualquier nivel Medio/Alto) no hay error
 FinFuncion
+
+// =====================================================================
+// Función:  Clasificación de impacto: Si paso modulo Validación técnica se ejecuta esta funcion
+// Clasifica el impacto del contenido según producción, duración y hora.
+// Reglas:
+//   - Alto: producción alta, duración > 120 min, o programado entre 20-23h.
+//   - Medio: producción media o duración entre 60-120 min.
+//   - Bajo: producción baja y duración <60 min.
+// Si el contenido cumple condiciones de varios niveles, se toma el más alto.
+// La función evalúa en orden descendente (Alto > Medio > Bajo) para garantizar la prioridad.
+Funcion impacto <- ClasificarImpacto(produccion, duracion, hora)
+    Definir impacto Como Caracter
+    // Alto: producción alta, duración > 120, o entre 20-23h
+    Si produccion = "Alto" O duracion > 120 O (hora >= 20 Y hora <= 23) Entonces
+        impacto <- "Alto"
+    SiNo
+        // Medio: producción media o duración entre 60 y 120
+        Si produccion = "Medio" O (duracion >= 60 Y duracion <= 120) Entonces
+            impacto <- "Medio"
+        SiNo
+            // Bajo: en caso contrario (producción baja y duración < 60)
+            impacto <- "Bajo"
+        FinSi
+    FinSi
+FinFuncion
+
+// =====================================================================
+// Función: DecisionFinal
+// Lógica:
+//   1. Si errorAcumulado no está vacío ? Rechazar (con el motivo).
+//   2. Si impacto = "Alto" ? Enviar a revisión.
+//   3. Si impacto es Bajo o Medio:
+//        - Verifica si la duración está en los límites exactos (mínimo o máximo)
+//          según el tipo de contenido.
+//        - Verifica si la hora está en los límites de la clasificación:
+//            +13: hora = 6 o 22.
+//            +18: hora = 22 o 5.
+//        - Si alguna condición se cumple, se acumula un mensaje de ajuste.
+//        - Si hay ajuste ? "Publicar con ajustes: [razón]".
+//        - Si no ? "Publicar: Contenido apto para publicación".
+// =====================================================================
+Funcion decision <- DecisionFinal(errorAcumulado, impacto, duracion, horaPrograma, clasificacionTexto, contenido)
+    Definir decision, motivoAjuste Como Caracter
+    motivoAjuste <- ""
+    
+    // 1. Si impacto Alto -> Enviar a revisión
+    Si impacto = "Alto" Entonces
+        decision <- "Enviar a revisión: El contenido tiene impacto Alto."
+        Retornar decision
+    FinSi
+    
+    // 2. Si impacto Bajo o Medio -> verificar si requiere ajuste menor
+	// =====================================================================
+	// Lógica:
+	// 1. Si error técnico = Rechazar.
+	// 2. Si impacto Alto = Enviar a revisión.
+	// 3. Si impacto Bajo o Medio:
+	//		Duración = mínimo o máximo ? acumula motivo de ajuste.
+	//		Hora = límite de clasificación (+13 a 6/22, +18 a 22/5) = acumula motivo de ajuste.
+	//		Si hay motivo ? Publicar con ajustes: [motivo].
+	//		Si no ? Publicar.
+	// =====================================================================
+    // Verificar duración en límites según tipo
+    Segun contenido Hacer
+        "Película":
+            Si duracion = 60 O duracion = 180 Entonces
+                motivoAjuste <- "Duración en el límite permitido (60-180 min)."
+            FinSi
+        "Serie":
+            Si duracion = 20 O duracion = 90 Entonces
+                motivoAjuste <- "Duración en el límite permitido (20-90 min)."
+            FinSi
+        "Documental":
+            Si duracion = 30 O duracion = 120 Entonces
+                motivoAjuste <- "Duración en el límite permitido (30-120 min)."
+            FinSi
+        "Evento en vivo":
+            Si duracion = 30 O duracion = 240 Entonces
+                motivoAjuste <- "Duración en el límite permitido (30-240 min)."
+            FinSi
+    FinSegun
+    
+    // 3. Verificar horario en límites de clasificación
+    Si clasificacionTexto = "+13" Y (horaPrograma = 6 O horaPrograma = 22) Entonces
+        Si motivoAjuste <> "" Entonces
+            motivoAjuste <- motivoAjuste + " Además, horario en el límite permitido (6-22 h)."
+        Sino
+            motivoAjuste <- "Horario en el límite permitido para +13 (6-22 h)."
+        FinSi
+    FinSi
+    Si clasificacionTexto = "+18" Y (horaPrograma = 22 O horaPrograma = 5) Entonces
+        Si motivoAjuste <> "" Entonces
+            motivoAjuste <- motivoAjuste + " Además, horario en el límite permitido (22-5 h)."
+        Sino
+            motivoAjuste <- "Horario en el límite permitido para +18 (22-5 h)."
+        FinSi
+    FinSi
+    
+    // Si hay algún ajuste -> Publicar con ajustes
+    Si motivoAjuste <> "" Entonces
+        decision <- "Publicar con ajustes: " + motivoAjuste
+    Sino
+        decision <- "Publicar: Contenido apto para publicación."
+    FinSi
+FinFuncion
+
 
 // Main
 Algoritmo Projecto1_GestorDecisiones_fase1
@@ -152,6 +256,8 @@ Algoritmo Projecto1_GestorDecisiones_fase1
 	Definir clasificacionTexto Como Caracter
 	Definir horaPrograma Como Entero
 	Definir nivelProduccion Como Caracter
+	Definir Impacto Como Caracter // Variable de almacenamiento 2.3 Clasificación de impacto (si pasó validación)
+	Definir decision Como Caracter // Variable para 2.4 Decisión final (según impacto)
 	
 	// Variables del contenidos 1 - 4
 	Definir infoContenido1 Como Caracter
@@ -267,13 +373,15 @@ Algoritmo Projecto1_GestorDecisiones_fase1
 						Escribir "¡Contenido aprobado y guardado!"
 						Escribir "----------------------------------------"
 						contadorContenido = contadorContenido + 1; // expresion se puede simplicar con contadorContenido++;
-						
-						// Guardar iformaccion de contenido según el contador 
+						// ========== 2.3 CLASIFICACION DE IMPACTO  ==========
+						// Luego que paso validacion tecnica, revisar que impacto tendra 
+						Impacto <- ClasificarImpacto(nivelProduccion, duracion, horaPrograma)
+						// Guardar toda la informaccion de contenido según el contador 
 						Segun contadorContenido Hacer
-							1: infoContenido1 <- nombreContenido + " | Tipo: " + contenido + " | Duración: " + ConvertirATexto(duracion) + " min | Clasificación: " + clasificacionTexto + " | Hora: " + ConvertirATexto(horaPrograma) + ":00 | Producción: " + nivelProduccion
-							2: infoContenido2 <- nombreContenido + " | Tipo: " + contenido + " | Duración: " + ConvertirATexto(duracion) + " min | Clasificación: " + clasificacionTexto + " | Hora: " + ConvertirATexto(horaPrograma) + ":00 | Producción: " + nivelProduccion
-							3: infoContenido3 <- nombreContenido + " | Tipo: " + contenido + " | Duración: " + ConvertirATexto(duracion) + " min | Clasificación: " + clasificacionTexto + " | Hora: " + ConvertirATexto(horaPrograma) + ":00 | Producción: " + nivelProduccion
-							4: infoContenido4 <- nombreContenido + " | Tipo: " + contenido + " | Duración: " + ConvertirATexto(duracion) + " min | Clasificación: " + clasificacionTexto + " | Hora: " + ConvertirATexto(horaPrograma) + ":00 | Producción: " + nivelProduccion
+							1: infoContenido1 <- nombreContenido + " | Tipo: " + contenido + " | Duración: " + ConvertirATexto(duracion) + " min | Clasificación: " + clasificacionTexto + " | Hora: " + ConvertirATexto(horaPrograma) + ":00 | Producción: " + nivelProduccion + " | Impacto: " + Impacto + " | Decisión: " + decision;
+							2: infoContenido2 <- nombreContenido + " | Tipo: " + contenido + " | Duración: " + ConvertirATexto(duracion) + " min | Clasificación: " + clasificacionTexto + " | Hora: " + ConvertirATexto(horaPrograma) + ":00 | Producción: " + nivelProduccion + " | Impacto: " + Impacto + " | Decisión: " + decision;
+							3: infoContenido3 <- nombreContenido + " | Tipo: " + contenido + " | Duración: " + ConvertirATexto(duracion) + " min | Clasificación: " + clasificacionTexto + " | Hora: " + ConvertirATexto(horaPrograma) + ":00 | Producción: " + nivelProduccion + " | Impacto: " + Impacto + " | Decisión: " + decision;
+							4: infoContenido4 <- nombreContenido + " | Tipo: " + contenido + " | Duración: " + ConvertirATexto(duracion) + " min | Clasificación: " + clasificacionTexto + " | Hora: " + ConvertirATexto(horaPrograma) + ":00 | Producción: " + nivelProduccion + " | Impacto: " + Impacto + " | Decisión: " + decision;
 						FinSegun
 					SiNo
 						Escribir "El contenido fue rechazado por la siguiente razón:"
