@@ -39,10 +39,10 @@ Esta pensado para un equipo de cualquier plataforma que recibe propuestas de con
 3. Compila el program.cs y ejecuta el archivo.
 
 # 💬 Podcasts
-Podcast #1 – Inicio y menú (enlace)
-Podcast #2 – Lógica de evaluación (enlace)
-Podcast #3 – Estadísticas y reglas (enlace)
-Podcast #4 – Cierre y reflexión (enlace)
+- Podcast #1 – Inicio y menú (enlace)
+- Podcast #2 – Lógica de evaluación (enlace)
+- Podcast #3 – Estadísticas y reglas (enlace)
+- Podcast #4 – Cierre y reflexión (enlace)
 
 # 📎Enlaces de archivos
 - 📈 [Diagrama de flujo]
