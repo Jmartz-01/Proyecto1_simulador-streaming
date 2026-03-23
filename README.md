@@ -45,7 +45,8 @@ Esta pensado para un equipo de cualquier plataforma que recibe propuestas de con
 - Podcast #3 – Estadísticas y reglas (enlace)
 - Podcast #4 – Cierre y reflexión (enlace)
 
-# 📎Enlaces de archivos
-- 📈 [Diagrama de flujo]
+# 📎Enlaces de archivos y desarollo
+- 📈 [Diagrama de flujo en app.eraser.io ](https://app.eraser.io/workspace/LPF307td3aL9VXfRojTQ?origin=share)
+  <img width="4494" height="1643" alt="diagram-export-3-23-2026-4_10_08-PM" src="https://github.com/user-attachments/assets/c14c3bbe-02fb-4a4d-b5f0-eda728555a6d" />
+- 👉 [Roadmap Interactivo e interfaz](https://github.com/user-attachments/files/26171365/markmap.html)
 - 📖 [Manual de usuario]
-- 🔗 [Roadmap Interactivo e interfaz](https://github.com/user-attachments/files/26171365/markmap.html)
