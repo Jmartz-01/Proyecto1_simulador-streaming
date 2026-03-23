@@ -21,7 +21,6 @@ SubProceso TipoContenido
 	Escribir "----------------------------------------";
 FinSubProceso
 
-
 // Metodo de mesajes (MenuPrincipal::Clasificaion del contenido) muestra opciones de tipo de categorias	
 SubProceso ClasificacionContenido
 	Escribir "----------------------------------------";
@@ -42,6 +41,34 @@ SubProceso Produccion
 	Escribir "2. Medio";
 	Escribir "3. Alto";
 	Escribir "----------------------------------------";
+FinSubProceso
+
+// Metodo de mesajes (MenuPrincipal: Reglas) Explica las reglas del sistema 
+SubProceso MostrarReglas
+    Escribir "====== Reglas del sistema ======";
+    Escribir "1. VALIDACIÓN TÉCNICA (obligatoria):";
+    Escribir "   - Clasificación vs horario:";
+    Escribir "        - Todo público: cualquier hora.";
+    Escribir "        - +13: solo entre 06:00 y 22:00.";
+    Escribir "        - +18: solo entre 22:00 y 05:00.";
+    Escribir "   - Duración por tipo de contenido:";
+    Escribir "        - Película: 60-180 minutos.";
+    Escribir "        - Serie: 20-90 minutos.";
+    Escribir "        - Documental: 30-120 minutos.";
+    Escribir "        - Evento en vivo: 30-240 minutos.";
+    Escribir "   - Nivel de producción:";
+    Escribir "        - Producción baja NO permitida para contenido +18.";
+    Escribir "2. CLASIFICACIÓN DE IMPACTO (solo si pasa validación):";
+    Escribir "   - Alto: producción alta, duración >120 min, o programado entre 20-23h.";
+    Escribir "   - Medio: producción media o duración entre 60-120 min.";
+    Escribir "   - Bajo: producción baja y duración <60 min.";
+    Escribir "   (Si cumple varias, se toma el nivel más alto)";
+    Escribir "3. DECISIÓN FINAL (solo si pasa validación):";
+    Escribir "   - Publicar: impacto Bajo o Medio, sin valores límite.";
+    Escribir "   - Publicar con ajustes: impacto Bajo o Medio y algún valor en límite exacto (duración mín/máx o hora límite según clasificación).";
+    Escribir "   - Enviar a revisión: impacto Alto.";
+    Escribir "   - Rechazar: no cumple alguna regla técnica (se muestra el motivo).";
+    Escribir "----------------------------------------";
 FinSubProceso
 
 
@@ -146,17 +173,18 @@ FinFuncion
 //   - Bajo: producción baja y duración <60 min.
 // Si el contenido cumple condiciones de varios niveles, se toma el más alto.
 // La función evalúa en orden descendente (Alto > Medio > Bajo) para garantizar la prioridad.
-Funcion impacto <- ClasificarImpacto(produccion, duracion, hora)
+// =====================================================================
+Funcion impacto <- ClasificarImpacto(nivel, duracion, hora)
     Definir impacto Como Caracter
-    // Alto: producción alta, duración > 120, o entre 20-23h
-    Si produccion = "Alto" O duracion > 120 O (hora >= 20 Y hora <= 23) Entonces
+    Si nivel = "Alto" O duracion > 120 O (hora >= 20 Y hora <= 23) Entonces
+		// Alto: producción alta, duración > 120, o entre 20-23h
         impacto <- "Alto"
     SiNo
-        // Medio: producción media o duración entre 60 y 120
-        Si produccion = "Medio" O (duracion >= 60 Y duracion <= 120) Entonces
+        Si nivel = "Medio" O (duracion >= 60 Y duracion <= 120) Entonces
+			// Medio: producción media o duración entre 60 y 120
             impacto <- "Medio"
         SiNo
-            // Bajo: en caso contrario (producción baja y duración < 60)
+			// Bajo: en caso contrario (producción baja y duración < 60)
             impacto <- "Bajo"
         FinSi
     FinSi
@@ -164,6 +192,7 @@ FinFuncion
 
 // =====================================================================
 // Función: DecisionFinal
+// Saber la acción final para un contenido que ha pasado las validaciones técnicas.
 // Lógica:
 //   1. Si errorAcumulado no está vacío ? Rechazar (con el motivo).
 //   2. Si impacto = "Alto" ? Enviar a revisión.
@@ -177,78 +206,74 @@ FinFuncion
 //        - Si hay ajuste ? "Publicar con ajustes: [razón]".
 //        - Si no ? "Publicar: Contenido apto para publicación".
 // =====================================================================
-Funcion decision <- DecisionFinal(errorAcumulado, impacto, duracion, horaPrograma, clasificacionTexto, contenido)
+Funcion decision <- DecisionFinal(impacto, duracion, horaPrograma, clasificacionTexto, contenido)
     Definir decision, motivoAjuste Como Caracter
     motivoAjuste <- ""
     
     // 1. Si impacto Alto -> Enviar a revisión
     Si impacto = "Alto" Entonces
         decision <- "Enviar a revisión: El contenido tiene impacto Alto."
-        Retornar decision
+	SiNo
+		// 2. Verificar duración en límites según tipo
+		Segun contenido Hacer
+			"Película":
+				Si duracion = 60 O duracion = 180 Entonces
+					motivoAjuste <- "Duración en el límite permitido (60-180 min)."
+				FinSi
+			"Serie":
+				Si duracion = 20 O duracion = 90 Entonces
+					motivoAjuste <- "Duración en el límite permitido (20-90 min)."
+				FinSi
+			"Documental":
+				Si duracion = 30 O duracion = 120 Entonces
+					motivoAjuste <- "Duración en el límite permitido (30-120 min)."
+				FinSi
+			"Evento en vivo":
+				Si duracion = 30 O duracion = 240 Entonces
+					motivoAjuste <- "Duración en el límite permitido (30-240 min)."
+				FinSi
+		FinSegun
+		
+		// 3. Verificar horario en límites de clasificación
+		Si clasificacionTexto = "+13" Y (horaPrograma = 6 O horaPrograma = 22) Entonces
+			Si motivoAjuste <> "" Entonces
+				motivoAjuste <- motivoAjuste + " Además, horario en el límite permitido (6-22 h)."
+			Sino
+				motivoAjuste <- "Horario en el límite permitido para +13 (6-22 h)."
+			FinSi
+		FinSi
+		Si clasificacionTexto = "+18" Y (horaPrograma = 22 O horaPrograma = 5) Entonces
+			Si motivoAjuste <> "" Entonces
+				motivoAjuste <- motivoAjuste + " Además, horario en el límite permitido (22-5 h)."
+			Sino
+				motivoAjuste <- "Horario en el límite permitido para +18 (22-5 h)."
+			FinSi
+		FinSi
+		// Si hay algún ajuste -> Publicar con ajustes
+		Si motivoAjuste <> "" Entonces
+			decision <- "Publicar con ajustes: " + motivoAjuste
+		Sino
+			decision <- "Publicar: Contenido apto para publicación."
+		FinSi
     FinSi
-    
-    // 2. Si impacto Bajo o Medio -> verificar si requiere ajuste menor
 	// =====================================================================
 	// Lógica:
-	// 1. Si error técnico = Rechazar.
-	// 2. Si impacto Alto = Enviar a revisión.
+	// 1. Si error técnico = Rechazar. Hecho ya con fase de validacion tecnica
+	// 2. Si impacto Alto = Enviar a revisión. Cumplido
 	// 3. Si impacto Bajo o Medio:
-	//		Duración = mínimo o máximo ? acumula motivo de ajuste.
+	//		Duración = mínimo o máximo = acumula motivo de ajuste.
 	//		Hora = límite de clasificación (+13 a 6/22, +18 a 22/5) = acumula motivo de ajuste.
-	//		Si hay motivo ? Publicar con ajustes: [motivo].
-	//		Si no ? Publicar.
+	//		Si hay motivo = Publicar con ajustes: [motivo].
+	//		Si no = Publicar.
 	// =====================================================================
-    // Verificar duración en límites según tipo
-    Segun contenido Hacer
-        "Película":
-            Si duracion = 60 O duracion = 180 Entonces
-                motivoAjuste <- "Duración en el límite permitido (60-180 min)."
-            FinSi
-        "Serie":
-            Si duracion = 20 O duracion = 90 Entonces
-                motivoAjuste <- "Duración en el límite permitido (20-90 min)."
-            FinSi
-        "Documental":
-            Si duracion = 30 O duracion = 120 Entonces
-                motivoAjuste <- "Duración en el límite permitido (30-120 min)."
-            FinSi
-        "Evento en vivo":
-            Si duracion = 30 O duracion = 240 Entonces
-                motivoAjuste <- "Duración en el límite permitido (30-240 min)."
-            FinSi
-    FinSegun
-    
-    // 3. Verificar horario en límites de clasificación
-    Si clasificacionTexto = "+13" Y (horaPrograma = 6 O horaPrograma = 22) Entonces
-        Si motivoAjuste <> "" Entonces
-            motivoAjuste <- motivoAjuste + " Además, horario en el límite permitido (6-22 h)."
-        Sino
-            motivoAjuste <- "Horario en el límite permitido para +13 (6-22 h)."
-        FinSi
-    FinSi
-    Si clasificacionTexto = "+18" Y (horaPrograma = 22 O horaPrograma = 5) Entonces
-        Si motivoAjuste <> "" Entonces
-            motivoAjuste <- motivoAjuste + " Además, horario en el límite permitido (22-5 h)."
-        Sino
-            motivoAjuste <- "Horario en el límite permitido para +18 (22-5 h)."
-        FinSi
-    FinSi
-    
-    // Si hay algún ajuste -> Publicar con ajustes
-    Si motivoAjuste <> "" Entonces
-        decision <- "Publicar con ajustes: " + motivoAjuste
-    Sino
-        decision <- "Publicar: Contenido apto para publicación."
-    FinSi
 FinFuncion
-
 
 // Main
 Algoritmo Projecto1_GestorDecisiones_fase1
 	// Defincion variables
 	Definir Usuario Como Caracter
 	
-	// Variables del contenido para transportar datos a variables 
+	// Variables del contenido para transportar datos a variables strings
 	definir nombreContenido Como Caracter
 	Definir contenido Como Caracter
 	Definir duracion Como Entero
@@ -256,7 +281,7 @@ Algoritmo Projecto1_GestorDecisiones_fase1
 	Definir clasificacionTexto Como Caracter
 	Definir horaPrograma Como Entero
 	Definir nivelProduccion Como Caracter
-	Definir Impacto Como Caracter // Variable de almacenamiento 2.3 Clasificación de impacto (si pasó validación)
+	Definir ImpactoContenido Como Caracter // Variable de almacenamiento 2.3 Clasificación de impacto (si pasó validación)
 	Definir decision Como Caracter // Variable para 2.4 Decisión final (según impacto)
 	
 	// Variables del contenidos 1 - 4
@@ -267,9 +292,17 @@ Algoritmo Projecto1_GestorDecisiones_fase1
 	
 	// Variables auxiliares evaluacion de datos
 	Definir opcionTipo Como Entero
-	Definir contadorContenido Como Entero
 	Definir errorAcumulado Como Caracter
+	Definir confirmacion Como Caracter
+	Definir totalPublicados, porcentajeAprobacion Como Real
+	Definir impactoPredominante Como Caracter
 	
+	// Contadores globales para estadisticas
+	Definir totalEvaluados, contPublicar, contPublicarAjustes, contRevision, contRechazar Como Entero
+	Definir contImpactoAlto, contImpactoMedio, contImpactoBajo Como Entero
+	Definir contadorContenido Como Entero
+	
+	// Mensaje de bienvenida
 	Escribir "Ingresa el nombre de tu usuario";
 	leer Usuario;
 	
@@ -280,9 +313,10 @@ Algoritmo Projecto1_GestorDecisiones_fase1
 		MenuPrincipal(Usuario);
 		leer menu;
 		Segun menu hacer
-			1:
+			1: // Ingresar nuevos datos
 				// Condicional para verificar si suportamos datos aun
 				si contadorContenido < 4 Entonces
+					totalEvaluados <- totalEvaluados + 1   // Registro de intentos de evaluo de un contenido
 					Escribir "Ingresa los siguentes datos:";
 					Escribir "-----------------------------";
 					Escribir "Cual es el nombre del contenido?";
@@ -290,7 +324,7 @@ Algoritmo Projecto1_GestorDecisiones_fase1
 					// Validar tipo de contenido
 					Repetir
 						TipoContenido()
-						Leer opcionTipo
+						Leer opcionTipo;
 						Si opcionTipo < 1 O opcionTipo > 4 Entonces
 							Escribir "Error: Elije una opción válida (1-4).";
 						FinSi
@@ -302,19 +336,16 @@ Algoritmo Projecto1_GestorDecisiones_fase1
 					// Validación de duaracion (Usando su propia variable)
 					Repetir
 						Escribir "Cual es la duración del contenido (minutos)?"
-						Leer duracion
+						Leer duracion;
 						Si duracion <= 0 Entonces
 							Escribir "Error: Ingrese una duración mayor a 0."
 						FinSi
-						si duracion >= 241 Entonces
-							Escribir "Error: Ingrese una duración menor a 240."
-						FinSi
-					Hasta Que duracion > 0 y duracion < 240
+					Hasta Que duracion > 0
 					
 					// Validar Clasificacion del Contenido
 					Repetir
 						ClasificacionContenido()
-						Leer opcionTipo
+						Leer opcionTipo;
 						Si opcionTipo < 1 O opcionTipo > 3 Entonces
 							Escribir "Error: Elije una opción válida (1-3).";
 						FinSi
@@ -325,17 +356,17 @@ Algoritmo Projecto1_GestorDecisiones_fase1
 					
 					// usando un switch para convertir valores en string
 					Segun opcionTipo Hacer
-						1: clasificacionTexto <- "Todo Público"
-						2: clasificacionTexto <- "+13"
-						3: clasificacionTexto <- "+18"
+						1: clasificacionTexto <- "Todo Público";
+						2: clasificacionTexto <- "+13";
+						3: clasificacionTexto <- "+18";
 					FinSegun
 					
 					// Validación de HORA (Usando su propia variable)
 					Repetir
-						Escribir "A que hora esta programado emitirse? (0-23):"
-						Leer horaPrograma
+						Escribir "A que hora esta programado emitirse? (0-23):";
+						Leer horaPrograma;
 						Si horaPrograma < 0 O horaPrograma > 23 Entonces
-							Escribir "Error: Hora es incorrecta, usa valores de 0 - 23."
+							Escribir "Error: Hora es incorrecta, usa valores de 0 - 23.";
 						FinSi
 					Hasta Que horaPrograma >= 0 Y horaPrograma <= 23
 					
@@ -352,11 +383,10 @@ Algoritmo Projecto1_GestorDecisiones_fase1
 					nivelProduccion <- Validacion_Produccion(opcionTipo)
 					
 					// ========== 2.2 VALIDACION TECNICA  ==========
-					// Objetivo es hacer metodos para hacer el codigo mas limpio
 					errorAcumulado <- ""
 					
 					// 1. Clasificación y horario
-					errorAcumulado = Validacion_Clasificacion_Horario(clasificacion, horaPrograma)
+					errorAcumulado <- Validacion_Clasificacion_Horario(clasificacion, horaPrograma)
 					
 					// 2. Duración (solo si no hay error previo)
 					Si errorAcumulado = "" Entonces
@@ -370,41 +400,149 @@ Algoritmo Projecto1_GestorDecisiones_fase1
 					
 					// Decidir si se aprueba el contenido
 					Si errorAcumulado = "" Entonces
-						Escribir "¡Contenido aprobado y guardado!"
-						Escribir "----------------------------------------"
-						contadorContenido = contadorContenido + 1; // expresion se puede simplicar con contadorContenido++;
 						// ========== 2.3 CLASIFICACION DE IMPACTO  ==========
-						// Luego que paso validacion tecnica, revisar que impacto tendra 
-						Impacto <- ClasificarImpacto(nivelProduccion, duracion, horaPrograma)
-						// Guardar toda la informaccion de contenido según el contador 
-						Segun contadorContenido Hacer
-							1: infoContenido1 <- nombreContenido + " | Tipo: " + contenido + " | Duración: " + ConvertirATexto(duracion) + " min | Clasificación: " + clasificacionTexto + " | Hora: " + ConvertirATexto(horaPrograma) + ":00 | Producción: " + nivelProduccion + " | Impacto: " + Impacto + " | Decisión: " + decision;
-							2: infoContenido2 <- nombreContenido + " | Tipo: " + contenido + " | Duración: " + ConvertirATexto(duracion) + " min | Clasificación: " + clasificacionTexto + " | Hora: " + ConvertirATexto(horaPrograma) + ":00 | Producción: " + nivelProduccion + " | Impacto: " + Impacto + " | Decisión: " + decision;
-							3: infoContenido3 <- nombreContenido + " | Tipo: " + contenido + " | Duración: " + ConvertirATexto(duracion) + " min | Clasificación: " + clasificacionTexto + " | Hora: " + ConvertirATexto(horaPrograma) + ":00 | Producción: " + nivelProduccion + " | Impacto: " + Impacto + " | Decisión: " + decision;
-							4: infoContenido4 <- nombreContenido + " | Tipo: " + contenido + " | Duración: " + ConvertirATexto(duracion) + " min | Clasificación: " + clasificacionTexto + " | Hora: " + ConvertirATexto(horaPrograma) + ":00 | Producción: " + nivelProduccion + " | Impacto: " + Impacto + " | Decisión: " + decision;
-						FinSegun
+						ImpactoContenido <- ClasificarImpacto(nivelProduccion, duracion, horaPrograma)
+						decision <- DecisionFinal(ImpactoContenido, duracion, horaPrograma, clasificacionTexto, contenido)
+						Escribir "----------------------------------------";
+						Escribir "Contenido aprobo la Fase Tecnica!";
+						Escribir "Impacto: ", ImpactoContenido;
+						Escribir "Decisión: ", decision;
+						Escribir "----------------------------------------";
+						
+						// Confirmación del usuario
+						
+						Escribir "¿Deseas guardar este contenido? (S/N)";
+						Leer confirmacion
+						Si Mayusculas(confirmacion) = "S" Entonces
+							contadorContenido = contadorContenido + 1; // expresion se puede simplicar con contadorContenido++;
+							
+							// Registro de Contadores de impacto
+							Segun ImpactoContenido Hacer
+								"Alto":  contImpactoAlto <- contImpactoAlto + 1
+								"Medio": contImpactoMedio <- contImpactoMedio + 1
+								"Bajo":  contImpactoBajo <- contImpactoBajo + 1
+							FinSegun
+							
+							// Registro de Contadores de decision
+							Si decision = "Publicar: Contenido apto para publicación." Entonces
+								contPublicar <- contPublicar + 1
+							Sino
+								Si Subcadena(decision, 1, 17) = "Publicar con ajustes" Entonces
+									contPublicarAjustes <- contPublicarAjustes + 1
+								Sino
+									Si Subcadena(decision, 1, 18) = "Enviar a revisión" Entonces
+										contRevision <- contRevision + 1
+									FinSi
+								FinSi
+							FinSi
+							Escribir "Contenido guardado correctamente.";
+							Escribir "----------------------------------------";
+							// Guardar toda la informaccion de contenido según el contador 
+							Segun contadorContenido Hacer
+								1: infoContenido1 <- nombreContenido + " | Tipo: " + contenido + " | Duración: " + ConvertirATexto(duracion) + " min | Clasificación: " + clasificacionTexto + " | Hora: " + ConvertirATexto(horaPrograma) + ":00 | Producción: " + nivelProduccion + " | Impacto: " + ImpactoContenido + " | Decisión: " + decision;
+								2: infoContenido2 <- nombreContenido + " | Tipo: " + contenido + " | Duración: " + ConvertirATexto(duracion) + " min | Clasificación: " + clasificacionTexto + " | Hora: " + ConvertirATexto(horaPrograma) + ":00 | Producción: " + nivelProduccion + " | Impacto: " + ImpactoContenido + " | Decisión: " + decision;
+								3: infoContenido3 <- nombreContenido + " | Tipo: " + contenido + " | Duración: " + ConvertirATexto(duracion) + " min | Clasificación: " + clasificacionTexto + " | Hora: " + ConvertirATexto(horaPrograma) + ":00 | Producción: " + nivelProduccion + " | Impacto: " + ImpactoContenido + " | Decisión: " + decision;
+								4: infoContenido4 <- nombreContenido + " | Tipo: " + contenido + " | Duración: " + ConvertirATexto(duracion) + " min | Clasificación: " + clasificacionTexto + " | Hora: " + ConvertirATexto(horaPrograma) + ":00 | Producción: " + nivelProduccion + " | Impacto: " + ImpactoContenido + " | Decisión: " + decision;
+							FinSegun
+						SiNo
+							Escribir "Contenido descartado por el usuario.";
+							Escribir "----------------------------------------";
+						FinSi
 					SiNo
-						Escribir "El contenido fue rechazado por la siguiente razón:"
-						Escribir errorAcumulado
-						Escribir "----------------------------------------"
+						Escribir "El contenido fue rechazado por la siguiente razón:";
+						Escribir errorAcumulado;
+						Escribir "----------------------------------------";
+						contRechazar <- contRechazar + 1   // registro de contenido que es rechazado técnicamente
 					FinSi
 				SiNo
 					Escribir "Error: Bibilioteca de datos esta llena"; 
 					Escribir "----------------------------------------"
 				FinSi
-			2:
-				Escribir "Seleccionaste la opción 2"
-			3:
-				Escribir "Seleccionaste la opción 3"
-				// TESTEO DE GUARDADO DE CONTENIDO (Se eleminara cuando se termine la seccion)
-				Imprimir infoContenido1;
-				Imprimir infoContenido2;
-				Imprimir infoContenido3;
-				Imprimir infoContenido4;
-			4:
-				Escribir "Seleccionaste la opción 4"
+			2: // Llamada de metodo MostrarReglas
+				MostrarReglas()
+			3: // Mostrar estadísticas
+				totalPublicados <- contPublicar + contPublicarAjustes
+				
+				// Calcular porcentaje de aprobación: publicados = contenidos aprobados y guardados.
+				// Se evita división entre cero verificando que totalEvaluados sea mayor que 0.
+				Si totalEvaluados > 0 Entonces
+					porcentajeAprobacion <- (publicados * 100) / totalEvaluados
+				Sino
+					porcentajeAprobacion <- 0
+				FinSi
+				
+				Escribir "===== Estadísticas de la sesión =====";
+				Escribir "----------------------------------------";
+				Escribir "Total de contenidos evaluados: ", totalEvaluados;
+				Escribir "----------------------------------------";
+				Escribir "Decisiones finales:";
+				Escribir "  Publicados: ", contPublicar;
+				Escribir "  Publicados con ajustes: ", contPublicarAjustes
+				Escribir "  Total publicados: ", totalPublicados
+				Escribir "  Enviar a revisión: ", contRevision;
+				Escribir "  Rechazados: ", contRechazar;
+				Escribir "----------------------------------------";
+				Escribir "Porcentaje de aprobación: ", Redon(porcentajeAprobacion), "%"
+				Escribir "----------------------------------------";
+				Escribir "Impactos:";
+				Escribir "  Alto: ", contImpactoAlto;
+				Escribir "  Medio: ", contImpactoMedio;
+				Escribir "  Bajo: ", contImpactoBajo;
+				Escribir "----------------------------------------";
+				Escribir " Contenidos En la sesion Guardados";
+				Escribir "----------------------------------------";
+				// Mostrar contenidos guardados si hay alguno 
+				Si infoContenido1 <> "" Entonces 
+					Imprimir "1. " + infoContenido1; 
+					Imprimir " ";
+				FinSi
+				Si infoContenido2 <> "" Entonces 
+					Imprimir "2. " + infoContenido2; 
+					Imprimir " ";
+				FinSi
+				Si infoContenido3 <> "" Entonces 
+					Imprimir "3. " + infoContenido3; 
+					Imprimir " ";
+				FinSi
+				Si infoContenido4 <> "" Entonces 
+					Imprimir "4. " + infoContenido4; 
+					Imprimir " ";
+				FinSi
+				
+				// Impacto predominante
+				Si contImpactoAlto >= contImpactoMedio Y contImpactoAlto >= contImpactoBajo Entonces
+					impactoPredominante <- "Alto"
+				SiNo
+					Si contImpactoMedio >= contImpactoBajo Entonces
+						impactoPredominante <- "Medio"
+					SiNo
+						impactoPredominante <- "Bajo"
+					FinSi
+				FinSi
+				
+				Escribir "========================================";
+				Escribir "Impacto predominante: ", impactoPredominante;
+				Escribir "========================================";
+			4: // Reiniciar estadísticas 
+				contadorContenido <- 0;
+				totalEvaluados <- 0;
+				contPublicar <- 0;
+				contPublicarAjustes <- 0;
+				contRevision <- 0;
+				contRechazar <- 0;
+				contImpactoAlto <- 0;
+				contImpactoMedio <- 0;
+				contImpactoBajo <- 0;
+				infoContenido1 <- "";
+				infoContenido2 <- "";
+				infoContenido3 <- "";
+				infoContenido4 <- "";
+				impactoPredominante <- "";
+				Escribir "Estadísticas reiniciadas.";
+				Escribir "----------------------------------------";
 			De Otro Modo:
-				Escribir "Error: Ingresa una opción valida!"
+				Escribir "Error: Ingresa una opción valida!";
+				Escribir "----------------------------------------";
 		FinSegun
 	Hasta Que menu = 5 // se repite hasta que el usuario ingrese 5
 FinAlgoritmo
