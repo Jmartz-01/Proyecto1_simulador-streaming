@@ -52,10 +52,15 @@ SubProceso MostrarReglas
     Escribir "        - +13: solo entre 06:00 y 22:00.";
     Escribir "        - +18: solo entre 22:00 y 05:00.";
     Escribir "   - Duración por tipo de contenido:";
-    Escribir "        - Película: 60-180 minutos.";
-    Escribir "        - Serie: 20-90 minutos.";
-    Escribir "        - Documental: 30-120 minutos.";
-    Escribir "        - Evento en vivo: 30-240 minutos.";
+	Definir i Como Entero // Definir i como inciador del for
+    Para i <- 1 Hasta 4 Hacer
+        Segun i Hacer
+            1: Escribir "        - Película: 60-180 minutos.";
+            2: Escribir "        - Serie: 20-90 minutos.";
+            3: Escribir "        - Documental: 30-120 minutos.";
+            4: Escribir "        - Evento en vivo: 30-240 minutos.";
+        FinSegun
+    FinPara
     Escribir "   - Nivel de producción:";
     Escribir "        - Producción baja NO permitida para contenido +18.";
     Escribir "2. CLASIFICACIÓN DE IMPACTO (solo si pasa validación):";
@@ -71,6 +76,94 @@ SubProceso MostrarReglas
     Escribir "----------------------------------------";
 FinSubProceso
 
+// Metodo de mensajes (Menu Pricipal:: Estadisticas) Muestra estadisticas de la sesion
+SubProceso MostrarEstadisticas(totalEvaluados, contPublicar, contPublicarAjustes, contRevision, contRechazar, contImpactoAlto, contImpactoMedio, contImpactoBajo, contadorContenido, infoContenido1, infoContenido2, infoContenido3, infoContenido4)
+    Definir totalPublicados, porcentajeAprobacion Como Real
+    Definir impactoPredominante Como Caracter
+    totalPublicados <- contPublicar + contPublicarAjustes
+    // Calcular porcentaje de aprobación
+    Si totalEvaluados > 0 Entonces
+        porcentajeAprobacion <- (totalPublicados * 100) / totalEvaluados
+    Sino
+        porcentajeAprobacion <- 0
+    FinSi
+    Escribir "===== Estadísticas de la sesión ====="
+    Escribir "----------------------------------------"
+    Escribir "Total de contenidos evaluados: ", totalEvaluados
+    Escribir "----------------------------------------"
+    Escribir "Decisiones finales:"
+    Escribir "  Publicados: ", contPublicar
+    Escribir "  Publicados con ajustes: ", contPublicarAjustes
+    Escribir "  Total publicados: ", totalPublicados
+    Escribir "  Enviar a revisión: ", contRevision
+    Escribir "  Rechazados: ", contRechazar
+    Escribir "----------------------------------------"
+    Escribir "Porcentaje de aprobación: ", Redon(porcentajeAprobacion), "%"
+    Escribir "----------------------------------------"
+    Escribir "Impactos:"
+    Escribir "  Alto: ", contImpactoAlto
+    Escribir "  Medio: ", contImpactoMedio
+    Escribir "  Bajo: ", contImpactoBajo
+    Escribir "----------------------------------------"
+    Escribir "Contenidos guardados en la sesión:"
+    Escribir "----------------------------------------"
+	// Mostrar contenidos guardados si hay alguno 
+	Si infoContenido1 <> "" Entonces 
+		Imprimir "1. " + infoContenido1; 
+		Imprimir " ";
+	FinSi
+	Si infoContenido2 <> "" Entonces 
+		Imprimir "2. " + infoContenido2; 
+		Imprimir " ";
+	FinSi
+	Si infoContenido3 <> "" Entonces 
+		Imprimir "3. " + infoContenido3; 
+		Imprimir " ";
+	FinSi
+	Si infoContenido4 <> "" Entonces 
+		Imprimir "4. " + infoContenido4; 
+		Imprimir " ";
+	FinSi
+    Si infoContenido1 = "" Y infoContenido2 = "" Y infoContenido3 = "" Y infoContenido4 = "" Entonces
+        Escribir "No hay contenidos guardados."
+    FinSi
+    // Calcular impacto predominante solo si hay contenidos guardados
+	Si contadorContenido > 0 Entonces
+		Si contImpactoAlto >= contImpactoMedio Y contImpactoAlto >= contImpactoBajo Entonces
+			impactoPredominante <- "Alto"
+		SiNo
+			Si contImpactoMedio >= contImpactoBajo Entonces
+				impactoPredominante <- "Medio"
+			SiNo
+				impactoPredominante <- "Bajo"
+			FinSi
+		FinSi
+	Sino
+		impactoPredominante <- "Ninguno (sin contenidos guardados)"
+	FinSi
+    Escribir "========================================"
+    Escribir "Impacto predominante: ", impactoPredominante
+    Escribir "========================================"
+FinSubProceso
+
+// Metodo de reinicio y asignacion de valores
+SubProceso ReiniciarEstadisticas(totalEvaluados, contPublicar, contPublicarAjustes, contRevision, contRechazar, contImpactoAlto, contImpactoMedio, contImpactoBajo, contadorContenido, infoContenido1, infoContenido2, infoContenido3, infoContenido4)
+    totalEvaluados <- 0
+    contPublicar <- 0
+    contPublicarAjustes <- 0
+    contRevision <- 0
+    contRechazar <- 0
+    contImpactoAlto <- 0
+    contImpactoMedio <- 0
+    contImpactoBajo <- 0
+    contadorContenido <- 0
+    infoContenido1 <- ""
+    infoContenido2 <- ""
+    infoContenido3 <- ""
+    infoContenido4 <- ""
+    Escribir "Estadísticas y datos reiniciados."
+    Escribir "----------------------------------------"
+FinSubProceso
 
 // Función que retorna el nombre del tipo de contenido según opción1
 Funcion txt <- Validacion_TipoContenido(opcion1)
@@ -209,7 +302,6 @@ FinFuncion
 Funcion decision <- DecisionFinal(impacto, duracion, horaPrograma, clasificacionTexto, contenido)
     Definir decision, motivoAjuste Como Caracter
     motivoAjuste <- ""
-    
     // 1. Si impacto Alto -> Enviar a revisión
     Si impacto = "Alto" Entonces
         decision <- "Enviar a revisión: El contenido tiene impacto Alto."
@@ -233,7 +325,6 @@ Funcion decision <- DecisionFinal(impacto, duracion, horaPrograma, clasificacion
 					motivoAjuste <- "Duración en el límite permitido (30-240 min)."
 				FinSi
 		FinSegun
-		
 		// 3. Verificar horario en límites de clasificación
 		Si clasificacionTexto = "+13" Y (horaPrograma = 6 O horaPrograma = 22) Entonces
 			Si motivoAjuste <> "" Entonces
@@ -294,8 +385,10 @@ Algoritmo Projecto1_GestorDecisiones_fase1
 	Definir opcionTipo Como Entero
 	Definir errorAcumulado Como Caracter
 	Definir confirmacion Como Caracter
-	Definir totalPublicados, porcentajeAprobacion Como Real
-	Definir impactoPredominante Como Caracter
+	
+	// Varibales que se usan en MostrarEstadisticas
+	// Definir totalPublicados, porcentajeAprobacion Como Real
+	// Definir impactoPredominante Como Caracter
 	
 	// Contadores globales para estadisticas
 	Definir totalEvaluados, contPublicar, contPublicarAjustes, contRevision, contRechazar Como Entero
@@ -461,88 +554,11 @@ Algoritmo Projecto1_GestorDecisiones_fase1
 			2: // Llamada de metodo MostrarReglas
 				MostrarReglas()
 			3: // Mostrar estadísticas
-				totalPublicados <- contPublicar + contPublicarAjustes
-				
-				// Calcular porcentaje de aprobación: publicados = contenidos aprobados y guardados.
-				// Se evita división entre cero verificando que totalEvaluados sea mayor que 0.
-				Si totalEvaluados > 0 Entonces
-					porcentajeAprobacion <- (publicados * 100) / totalEvaluados
-				Sino
-					porcentajeAprobacion <- 0
-				FinSi
-				
-				Escribir "===== Estadísticas de la sesión =====";
-				Escribir "----------------------------------------";
-				Escribir "Total de contenidos evaluados: ", totalEvaluados;
-				Escribir "----------------------------------------";
-				Escribir "Decisiones finales:";
-				Escribir "  Publicados: ", contPublicar;
-				Escribir "  Publicados con ajustes: ", contPublicarAjustes
-				Escribir "  Total publicados: ", totalPublicados
-				Escribir "  Enviar a revisión: ", contRevision;
-				Escribir "  Rechazados: ", contRechazar;
-				Escribir "----------------------------------------";
-				Escribir "Porcentaje de aprobación: ", Redon(porcentajeAprobacion), "%"
-				Escribir "----------------------------------------";
-				Escribir "Impactos:";
-				Escribir "  Alto: ", contImpactoAlto;
-				Escribir "  Medio: ", contImpactoMedio;
-				Escribir "  Bajo: ", contImpactoBajo;
-				Escribir "----------------------------------------";
-				Escribir " Contenidos En la sesion Guardados";
-				Escribir "----------------------------------------";
-				// Mostrar contenidos guardados si hay alguno 
-				Si infoContenido1 <> "" Entonces 
-					Imprimir "1. " + infoContenido1; 
-					Imprimir " ";
-				FinSi
-				Si infoContenido2 <> "" Entonces 
-					Imprimir "2. " + infoContenido2; 
-					Imprimir " ";
-				FinSi
-				Si infoContenido3 <> "" Entonces 
-					Imprimir "3. " + infoContenido3; 
-					Imprimir " ";
-				FinSi
-				Si infoContenido4 <> "" Entonces 
-					Imprimir "4. " + infoContenido4; 
-					Imprimir " ";
-				FinSi
-				
-				// Impacto predominante
-				Si contImpactoAlto >= contImpactoMedio Y contImpactoAlto >= contImpactoBajo Entonces
-					impactoPredominante <- "Alto"
-				SiNo
-					Si contImpactoMedio >= contImpactoBajo Entonces
-						impactoPredominante <- "Medio"
-					SiNo
-						impactoPredominante <- "Bajo"
-					FinSi
-				FinSi
-				
-				Escribir "========================================";
-				Escribir "Impacto predominante: ", impactoPredominante;
-				Escribir "========================================";
+				MostrarEstadisticas(totalEvaluados, contPublicar, contPublicarAjustes, contRevision, contRechazar, contImpactoAlto, contImpactoMedio, contImpactoBajo, contadorContenido, infoContenido1, infoContenido2, infoContenido3, infoContenido4)
 			4: // Reiniciar estadísticas 
-				contadorContenido <- 0;
-				totalEvaluados <- 0;
-				contPublicar <- 0;
-				contPublicarAjustes <- 0;
-				contRevision <- 0;
-				contRechazar <- 0;
-				contImpactoAlto <- 0;
-				contImpactoMedio <- 0;
-				contImpactoBajo <- 0;
-				infoContenido1 <- "";
-				infoContenido2 <- "";
-				infoContenido3 <- "";
-				infoContenido4 <- "";
-				impactoPredominante <- "";
-				Escribir "Estadísticas reiniciadas.";
-				Escribir "----------------------------------------";
-			De Otro Modo:
-				Escribir "Error: Ingresa una opción valida!";
-				Escribir "----------------------------------------";
+				ReiniciarEstadisticas(totalEvaluados, contPublicar, contPublicarAjustes, contRevision, contRechazar, contImpactoAlto, contImpactoMedio, contImpactoBajo, contadorContenido, infoContenido1, infoContenido2, infoContenido3, infoContenido4)
 		FinSegun
 	Hasta Que menu = 5 // se repite hasta que el usuario ingrese 5
+	MostrarEstadisticas(totalEvaluados, contPublicar, contPublicarAjustes, contRevision, contRechazar, contImpactoAlto, contImpactoMedio, contImpactoBajo, contadorContenido, infoContenido1, infoContenido2, infoContenido3, infoContenido4)
+	Escribir "Gracias por usar el Gestor de Streaming ", Usuario, "."
 FinAlgoritmo
