@@ -40,10 +40,17 @@ Esta pensado para un equipo de cualquier plataforma que recibe propuestas de con
 
 # 💬 Podcasts
 - Podcast #1 – Inicio y menú
-  - [PODCAST 1.1 De la idea al código: construyendo un gestor de streaming con reglas inteligentes](https://correo2urledu-my.sharepoint.com/:u:/g/personal/jpmartinezci_correo_url_edu_gt/IQD3Q1poOLTzSIsM7YVhXvHPAQMMRcp14XqWhmVlnRNLbkY?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=5g413e)
-- Podcast #2 – Lógica de evaluación (enlace)
-- Podcast #3 – Estadísticas y reglas (enlace)
-- Podcast #4 – Cierre y reflexión (enlace)
+  - [▶️ 1.1 De la idea al código: construyendo un gestor de streaming con reglas inteligentes](https://correo2urledu-my.sharepoint.com/:u:/g/personal/jpmartinezci_correo_url_edu_gt/IQD3Q1poOLTzSIsM7YVhXvHPAQMMRcp14XqWhmVlnRNLbkY?e=IoNYBi&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D)
+
+- Podcast #2 – Lógica de evaluación    
+  - [▶️ 1.2 La Evolución del Guardián de Streaming.](https://correo2urledu-my.sharepoint.com/:u:/g/personal/jpmartinezci_correo_url_edu_gt/IQDkbA8zYy2sQKtPkIb3lekTARS-yPVPhBU6QTD7u5Ep7k0?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=4vwegk)
+  
+  - [▶️ 1.3 La Bitácora del Desarrollador (Commits y Estándares)](https://correo2urledu-my.sharepoint.com/:u:/g/personal/jpmartinezci_correo_url_edu_gt/IQAH_6_YCJI2QJkDMoMGkWlfAc4yMKXFaSpRPvnDdcAyanw?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=da8G7R)
+
+- Podcast #3 – Estadísticas y reglas
+  - [▶️ 1.4 La Anatomía del Flujo (Explicación del Diagrama)](https://correo2urledu-my.sharepoint.com/:u:/g/personal/jpmartinezci_correo_url_edu_gt/IQBmPbQ-4ib6S5JvPgKKSf1PATl753anq26-wey7P5JJV6Q?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=wLaNbY)
+
+- Podcast #4 – Cierre y reflexión 
 
 # 📎Enlaces de archivos y desarollo
 - 📈 [Diagrama de flujo en app.eraser.io ](https://app.eraser.io/workspace/LPF307td3aL9VXfRojTQ?origin=share)
