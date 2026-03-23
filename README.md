@@ -49,4 +49,7 @@ Esta pensado para un equipo de cualquier plataforma que recibe propuestas de con
 - 📈 [Diagrama de flujo en app.eraser.io ](https://app.eraser.io/workspace/LPF307td3aL9VXfRojTQ?origin=share)
   <img width="4494" height="1643" alt="diagram-export-3-23-2026-4_10_08-PM" src="https://github.com/user-attachments/assets/c14c3bbe-02fb-4a4d-b5f0-eda728555a6d" />
 - 👉 [Roadmap Interactivo e interfaz](https://github.com/user-attachments/files/26171365/markmap.html)
+
+<video src="https://github.com/user-attachments/assets/93bca3db-a43e-4faf-ac5e-88583e269b9b" controls="controls" style="max-width: 100%;"></video>
+
 - 📖 [Manual de usuario]
