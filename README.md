@@ -13,7 +13,8 @@ Esta pensado para un equipo de cualquier plataforma que recibe propuestas de con
 1. Clona el repositorio y copia el url del repositorio
 2. Tambien puedes descargar el archivo `Program.cs` y ejecuta el programa con un compilador.
 
-[📖 Manual de usuario 1](https://github.com/user-attachments/files/26235749/final.Manual.de.Usuario.Gestor.de.Decisiones.de.Contenido.Streaming.pdf) || [📖 Manual de usuario 2](https://github.com/user-attachments/files/26235909/Manual.de.Usuario.Gestor.de.Decisiones.de.Contenido.Streaming.pdf)
+[📖 Manual de usuario 1]([https://github.com/user-attachments/files/26235749/final.Manual.de.Usuario.Gestor.de.Decisiones.de.Contenido.Streaming.pdf](https://github.com/user-attachments/files/26250093/CORREGIDO.Manual.de.Usuario.Gestor.de.Decisiones.de.Contenido.Streaming.pdf)) | [📖 Manual de usuario 2](https://github.com/user-attachments/files/26235909/Manual.de.Usuario.Gestor.de.Decisiones.de.Contenido.Streaming.pdfERROR)
+
 
 
 > El programa guía paso a paso al usuario. No almacena una lista de contenidos, solo evalúa cada propuesta y mantiene estadísticas generales de la sesión.
