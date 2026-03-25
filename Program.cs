@@ -4,8 +4,7 @@ class Program
     // Metodo muestra el Menu inicial
     static void MenuPrincipal(string nombre)
     {
-        Console.Write("Bienvenido al Gestor de Streaming " + nombre);
-        Console.WriteLine("----------------------------------------");
+        Console.WriteLine("Bienvenido al Gestor de Streaming " + nombre);
         Console.WriteLine("----------------------------------------");
         Console.WriteLine("1. Evaluar nuevo contenido");
         Console.WriteLine("2. Mostrar reglas del sistema");
