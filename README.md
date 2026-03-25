@@ -134,3 +134,93 @@ Los diagramas de flujo documentan la lógica de cada módulo del sistema. Se enc
   [Descargar roadmap](https://github.com/user-attachments/files/26171365/markmap.html)
   
   <video src="https://github.com/user-attachments/assets/93bca3db-a43e-4faf-ac5e-88583e269b9b" controls="controls" style="max-width: 100%;"></video>
+
+#### Testeo de errores del programa 🦠
+
+<details>
+<summary> ⌦ Testeo de errores y funcionalidad del programa</summary>
+
+##  Validaciones Técnicas – Rechazos
+
+| # | Nombre | Tipo | Duración (min) | Clasificación | Hora | Producción | Regla evaluada |
+|---|--------|------|:--------------:|:-------------:|:----:|:----------:|----------------|
+| 1 | Horario +13 fuera | Película | 120 | +13 | 23 | Alto | Hora 23 > 22 → rechazo horario +13 |
+| 2 | Horario +18 en día | Serie | 45 | +18 | 14 | Medio | Hora 14 (6–21) → rechazo horario +18 |
+| 3 | Película corta | Película | 50 | Todo público | 12 | Medio | Duración < 60 |
+| 4 | Película larga | Película | 190 | +13 | 20 | Alto | Duración > 180 |
+| 5 | Serie larga | Serie | 95 | Todo público | 15 | Bajo | Duración > 90 |
+| 6 | Documental corto | Documental | 25 | Todo público | 18 | Medio | Duración < 30 |
+| 7 | Documental largo | Documental | 130 | +13 | 16 | Alto | Duración > 120 |
+| 8 | Evento muy largo | Evento en vivo | 250 | +13 | 21 | Alto | Duración > 240 |
+| 9 | Evento muy corto | Evento en vivo | 25 | Todo público | 20 | Medio | Duración < 30 |
+| 10 | Producción baja +18 | Película | 100 | +18 | 23 | Bajo | Prohibido producción baja en +18 |
+
+
+## ✅ Aprobados – Impacto BAJO
+
+| # | Nombre | Tipo | Duración (min) | Clasificación | Hora | Producción | Decisión | Notas |
+|---|--------|------|:--------------:|:-------------:|:----:|:----------:|:--------:|-------|
+| 11 | Película normal baja | Película | 90 | Todo público | 14 | Bajo | Publicar | Cumple todo, sin límites |
+| 12 | Serie corta baja | Serie | 25 | Todo público | 18 | Bajo | Publicar | Producción baja, duración <60, hora no prime |
+| 13 | Documental bajo | Documental | 50 | +13 | 10 | Bajo | Publicar | Duración <60, producción baja |
+
+
+## ✅ Aprobados – Impacto MEDIO
+
+| # | Nombre | Tipo | Duración (min) | Clasificación | Hora | Producción | Decisión | Notas |
+|---|--------|------|:--------------:|:-------------:|:----:|:----------:|:--------:|-------|
+| 14 | Película producción media | Película | 90 | +13 | 15 | Medio | Publicar | Producción media → impacto Medio |
+| 15 | Serie duración media | Serie | 60 | Todo público | 19 | Bajo | Publicar | Duración 60 (rango medio) |
+| 16 | Documental duración media | Documental | 90 | Todo público | 14 | Bajo | Publicar | Duración en 60–120, producción baja |
+| 17 | Evento duración media | Evento en vivo | 120 | +13 | 16 | Bajo | Publicar | Duración 120 (rango medio) |
+
+
+## ✅ Aprobados – Impacto ALTO
+
+| # | Nombre | Tipo | Duración (min) | Clasificación | Hora | Producción | Decisión | Notas |
+|---|--------|------|:--------------:|:-------------:|:----:|:----------:|:--------:|-------|
+| 18 | Producción alta | Película | 100 | +13 | 15 | Alto | Enviar a revisión | Producción Alta → impacto Alto |
+| 19 | Duración >120 | Serie | 130 | Todo público | 14 | Medio | Enviar a revisión | Duración >120 → impacto Alto |
+| 20 | Horario prime | Documental | 90 | +13 | 21 | Bajo | Enviar a revisión | Hora 21 (20–23) → impacto Alto |
+| 21 | Combinación múltiple | Película | 150 | +18 | 22 | Alto | Enviar a revisión | Producción alta + duración >120 + horario prime |
+
+
+## ✅ Aprobados – Publicar con Ajustes
+
+| # | Nombre | Tipo | Duración (min) | Clasificación | Hora | Producción | Impacto | Notas |
+|---|--------|------|:--------------:|:-------------:|:----:|:----------:|:-------:|-------|
+| 22 | Duración límite inferior | Serie | 20 | Todo público | 14 | Medio | Medio | Duración mínima (20) |
+| 23 | Duración límite superior | Película | 180 | +13 | 21 | Bajo | Bajo | Duración máxima (180) |
+| 24 | Horario límite +13 inferior | Película | 100 | +13 | 6 | Medio | Medio | Hora límite inferior +13 (6) |
+| 25 | Horario límite +13 superior | Película | 100 | +13 | 22 | Bajo | Bajo | Hora límite superior +13 (22) |
+| 26 | Horario límite +18 | Película | 100 | +18 | 22 | Alto | Alto | Impacto Alto prevalece → Enviar a revisión |
+| 27 | Horario límite +18 noche | Película | 100 | +18 | 5 | Alto | Alto | Impacto Alto domina → Enviar a revisión |
+| 28 | Doble límite | Película | 60 | +13 | 22 | Bajo | Bajo | Duración mínima + hora límite superior +13 |
+
+
+## Pruebas de Límite de Almacenamiento, Cancelación y Reinicio
+
+| # | Nombre | Descripción |
+|---|--------|-------------|
+| 29 | Quinto contenido | Técnicamente válido pero biblioteca llena (4 ya guardados) → no se guarda |
+| 30 | Cancelado por usuario | Aprobado técnicamente, usuario elige `N` → no se guarda |
+| 31 | Reinicio (opción 4) | Todos los contadores y el almacenamiento se reinician a cero |
+
+
+## Pruebas de Valores Límite / Borde
+
+| # | Nombre | Tipo | Duración (min) | Clasificación | Hora | Producción | Impacto | Decisión | Notas |
+|---|--------|------|:--------------:|:-------------:|:----:|:----------:|:-------:|:--------:|-------|
+| 32 | Película límite inferior | Película | 60 | Todo público | 12 | Medio | Medio | Publicar con ajustes | Duración exacta 60 |
+| 33 | Película límite superior | Película | 180 | Todo público | 13 | Alto | Alto | Enviar a revisión | Duración máxima + producción alta |
+| 34 | Serie límite inferior | Serie | 20 | Todo público | 14 | Bajo | Bajo | Publicar con ajustes | Duración mínima, producción baja |
+| 35 | Serie límite superior | Serie | 90 | Todo público | 15 | Medio | Medio | Publicar con ajustes | Duración máxima |
+| 36 | Documental límite inferior | Documental | 30 | Todo público | 16 | Alto | Alto | Enviar a revisión | Duración mínima, producción alta |
+| 37 | Documental límite superior | Documental | 120 | Todo público | 17 | Medio | Medio | Publicar con ajustes | Duración máxima, producción media |
+| 38 | Evento límite inferior | Evento en vivo | 30 | Todo público | 18 | Alto | Alto | Enviar a revisión | Duración mínima, producción alta |
+| 39 | Evento límite superior | Evento en vivo | 240 | Todo público | 19 | Medio | Medio | Publicar con ajustes | Duración máxima, producción media |
+| 40 | +13 hora límite 6 | Película | 100 | +13 | 6 | Alto | Alto | Enviar a revisión | Hora límite, producción alta |
+| 41 | +13 hora límite 22 | Película | 100 | +13 | 22 | Bajo | Bajo | Publicar con ajustes | Hora límite, producción baja |
+| 42 | +18 hora límite 22 | Película | 100 | +18 | 22 | Alto | Alto | Enviar a revisión | Hora límite, impacto Alto |
+| 43 | +18 hora límite 5 | Película | 100 | +18 | 5 | Alto | Alto | Enviar a revisión | Hora límite, impacto Alto |
+</details>
