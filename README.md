@@ -39,24 +39,30 @@ Esta pensado para un equipo de cualquier plataforma que recibe propuestas de con
 3. Compila el program.cs y ejecuta el archivo.
 
 # 💬 Podcasts
-- Podcast #1 – Inicio y menú
+**Podcast #1 – Inicio y menú**  
   - [▶️ 1.1 De la idea al código: construyendo un gestor de streaming con reglas inteligentes](https://correo2urledu-my.sharepoint.com/:u:/g/personal/jpmartinezci_correo_url_edu_gt/IQD3Q1poOLTzSIsM7YVhXvHPAQMMRcp14XqWhmVlnRNLbkY?e=IoNYBi&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D)
 
-- Podcast #2 – Lógica de evaluación    
+- **Podcast #2 – Lógica de evaluación**    
   - [▶️ 1.2 La Evolución del Guardián de Streaming.](https://correo2urledu-my.sharepoint.com/:u:/g/personal/jpmartinezci_correo_url_edu_gt/IQDkbA8zYy2sQKtPkIb3lekTARS-yPVPhBU6QTD7u5Ep7k0?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=4vwegk)
   
   - [▶️ 1.3 La Bitácora del Desarrollador (Commits y Estándares)](https://correo2urledu-my.sharepoint.com/:u:/g/personal/jpmartinezci_correo_url_edu_gt/IQAH_6_YCJI2QJkDMoMGkWlfAc4yMKXFaSpRPvnDdcAyanw?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=da8G7R)
 
-- Podcast #3 – Estadísticas y reglas
+- **Podcast #3 – Estadísticas y reglas**
   - [▶️ 1.4 La Anatomía del Flujo (Explicación del Diagrama)](https://correo2urledu-my.sharepoint.com/:u:/g/personal/jpmartinezci_correo_url_edu_gt/IQBmPbQ-4ib6S5JvPgKKSf1PATl753anq26-wey7P5JJV6Q?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=wLaNbY)
 
-- Podcast #4 – Cierre y reflexión 
+- **Podcast #4 – Cierre y reflexión **
 
 # 📎Enlaces de archivos y desarollo
-- 📈 Diagrama de flujo en app.eraser.io 
 
+## Diagramas de flujo 
+_📈 Diagrama de flujo en app.eraser.io_
   <img width="4494" height="1643" alt="diagram-export-3-23-2026-4_10_08-PM" src="https://github.com/user-attachments/assets/c14c3bbe-02fb-4a4d-b5f0-eda728555a6d" />
+
+
+
 > 📁 _Archivo PSeint tambien disponible en directorio Diagramas de flujo/Projecto_GestorDecisiones_Fase1.psc_
+
+
 - 👉 [Roadmap Interactivo e interfaz](https://github.com/user-attachments/files/26171365/markmap.html)
 
 <video src="https://github.com/user-attachments/assets/93bca3db-a43e-4faf-ac5e-88583e269b9b" controls="controls" style="max-width: 100%;"></video>
