@@ -119,8 +119,12 @@ Los diagramas de flujo documentan la lógica de cada módulo del sistema. Se enc
 
 <p>Fase final donde se ponderan las variables aprobadas para generar el dictamen de publicación.</p>
 <p align="center">
-<img src="Diagramas%20de%20flujo/ClasificarImpacto.png" alt="Clasificar impacto" width="45%">
-<img src="Diagramas%20de%20flujo/DecisionFinal.png" alt="Decisión final" width="45%">
+<ul>
+  <li>Flujo de la funcion ClasificarImpacto</li>
+  <li><img src="Diagramas%20de%20flujo/ClasificarImpacto.png" alt="Clasificar impacto" width="45%"></li>
+  <li><strong>Flujo total de la decision final</strong></li>
+  <li><img src="Diagramas%20de%20flujo/DecisionFinal.png" alt="Decisión final" width="45%"></li>
+</ul>
 </p>
 </details>
 
