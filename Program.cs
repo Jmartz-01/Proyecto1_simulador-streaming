@@ -428,7 +428,7 @@ class Program
 	}
 
 	// Main
-	static void Main(string[] args)
+	static void Main()
 	{
 		// Definición de variables
 		string Usuario;
